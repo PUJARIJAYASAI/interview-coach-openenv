@@ -16,12 +16,14 @@ dependencies = [
     "gradio",
     "fastapi",
     "uvicorn[standard]",
-    "pydantic"
+    "pydantic",
+    "openenv-core>=0.2.1"
 ]
 
-# This allows the environment to be run as a CLI command
 [project.scripts]
+server = "server.app:app"
 interview-coach-sim = "inference:run_simulation"
 
 [tool.setuptools]
-py-modules = ["env", "grader", "inference", "app"]
+packages = ["server"]
+py-modules = ["env", "grader", "inference"]

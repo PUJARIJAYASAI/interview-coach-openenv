@@ -16,7 +16,7 @@ WORKDIR $HOME/app
 COPY --chown=user requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Copy application files
+# Copy application files (including server/ directory and uv.lock)
 COPY --chown=user . .
 
 # Set default env vars for Hugging Face
@@ -27,5 +27,5 @@ ENV TASK_NAME=easy
 # Expose port for FastAPI/Gradio
 EXPOSE 7860
 
-# Run the FastAPI application with Uvicorn
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
+# Run the FastAPI application using the new structured entry point
+CMD ["uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "7860"]
