@@ -1,15 +1,31 @@
 FROM python:3.10-slim
 
-WORKDIR /app
+# Install system dependencies if any (none needed for pure Python)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Set up user for Hugging Face Spaces (UID 1000)
+RUN useradd -m -u 1000 user
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
+WORKDIR $HOME/app
 
-COPY . .
+# Copy and install dependencies
+COPY --chown=user requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Set default env vars for local testing
+# Copy application files
+COPY --chown=user . .
+
+# Set default env vars for Hugging Face
 ENV API_BASE_URL=https://router.huggingface.co/v1
-ENV MODEL_NAME=Qwen/Qwen2.5-72B-Instruct
+ENV MODEL_NAME=deepseek-ai/DeepSeek-R1
 ENV TASK_NAME=easy
 
-CMD ["python", "inference.py"]
+# Expose port for Gradio
+EXPOSE 7860
+
+# Run the web application
+CMD ["python", "app.py"]
