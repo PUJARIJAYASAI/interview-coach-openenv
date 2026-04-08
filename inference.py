@@ -88,7 +88,8 @@ Return ONLY the action name from the list.
                     temperature=0.6,
                     max_tokens=64
                 )
-                raw_action = response.choices[0].message.content.strip().lower()
+                content = response.choices[0].message.content
+                raw_action = content.strip().lower() if content else ""
                 
                 # Map response to valid actions
                 action = "ask_easy_question"
