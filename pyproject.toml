@@ -24,17 +24,16 @@ dependencies = [
 server = "server.app:main"
 interview-coach-sim = "inference:run_simulation"
 
-# Redundant registration for maximum discovery compatibility
+# Formal package-based entry points for OpenEnv discovery
 [project.entry-points."openenv.tasks"]
-easy = "grader:grade_easy"
-medium = "grader:grade_medium"
-hard = "grader:grade_hard"
+easy = "interview_coach.grader:grade_easy"
+medium = "interview_coach.grader:grade_medium"
+hard = "interview_coach.grader:grade_hard"
 
 [project.entry-points."openenv.graders"]
-easy = "grader:grade_easy"
-medium = "grader:grade_medium"
-hard = "grader:grade_hard"
+easy = "interview_coach.grader:grade_easy"
+medium = "interview_coach.grader:grade_medium"
+hard = "interview_coach.grader:grade_hard"
 
 [tool.setuptools]
-packages = ["server"]
-py-modules = ["env", "grader", "inference"]
+packages = ["interview_coach", "server"]

@@ -4,8 +4,8 @@ import time
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 import gradio as gr
-from env import InterviewEnv
-import grader
+from interview_coach.env import InterviewEnv
+from interview_coach import grader
 from inference import run_simulation
 
 # --- FastAPI Setup ---

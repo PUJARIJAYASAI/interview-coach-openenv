@@ -5,8 +5,8 @@ import io
 import contextlib
 import traceback
 from openai import OpenAI
-from env import InterviewEnv
-import grader
+from interview_coach.env import InterviewEnv
+from interview_coach import grader
 
 def run_simulation(task_name="easy", hf_token=None):
     """
