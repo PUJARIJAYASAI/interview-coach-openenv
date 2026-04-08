@@ -24,16 +24,10 @@ dependencies = [
 server = "server.app:main"
 interview-coach-sim = "inference:run_simulation"
 
-# Formal package-based entry points for OpenEnv discovery
+# Professional entry point for task discovery
 [project.entry-points."openenv.tasks"]
-easy = "interview_coach.grader:grade_easy"
-medium = "interview_coach.grader:grade_medium"
-hard = "interview_coach.grader:grade_hard"
-
-[project.entry-points."openenv.graders"]
-easy = "interview_coach.grader:grade_easy"
-medium = "interview_coach.grader:grade_medium"
-hard = "interview_coach.grader:grade_hard"
+interview_coach = "tasks:TASKS"
 
 [tool.setuptools]
-packages = ["interview_coach", "server"]
+packages = ["server"]
+py-modules = ["interview_env", "tasks", "inference"]

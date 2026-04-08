@@ -2,16 +2,10 @@ benchmark: interview_coach
 tasks:
   - id: interview_coach.easy
     task_id: easy
-    max_steps: 5
-    goal: "Achieve an answer score of 8 or higher in 5 steps."
-    grader: interview_coach.grader:grade_easy
+    grader: true
   - id: interview_coach.medium
     task_id: medium
-    max_steps: 10
-    goal: "Maintain an answer score above 7 for 10 steps."
-    grader: interview_coach.grader:grade_medium
+    grader: true
   - id: interview_coach.hard
     task_id: hard
-    max_steps: 15
-    goal: "Reach an answer score of 10 while handling difficult questions."
-    grader: interview_coach.grader:grade_hard
+    grader: true

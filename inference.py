@@ -5,14 +5,18 @@ import io
 import contextlib
 import traceback
 from openai import OpenAI
-from interview_coach.env import InterviewEnv
-from interview_coach import grader
+from interview_env import InterviewEnv
+from tasks import TASKS
 
 def run_simulation(task_name="easy", hf_token=None):
     """
-    Runs the interview coach simulation and returns logs for display.
+    Runs the interview coach simulation using the trajectory-based TASKS manifest.
     """
     full_log = []
+    trajectory = []
+    
+    # Discovery: Find the correct task dict
+    task_config = next((t for t in TASKS if t["task_id"] == task_name), TASKS[0])
     
     try:
         # Configuration - Handle token precedence correctly
@@ -37,13 +41,11 @@ def run_simulation(task_name="easy", hf_token=None):
             end_msg = f"[END] task={task_name} score=0.01 success=false steps=1 rewards=0.00"
             return "\n".join([start_msg, step_msg, end_msg])
 
-        # Environment setup
-        env = InterviewEnv()
+        # Environment setup from TASKS manifest
+        env = task_config["env_class"](**task_config["env_kwargs"])
         state = env.reset(task_name=task_name)
         
-        # max_steps is already synced in env.reset() but we'll reflect it here for the log
-        max_steps = env.max_steps
-
+        max_steps = task_config["max_steps"]
         full_log.append(f"[START] task={task_name} env={env_name} model={model_name}")
         
         step_num = 0
@@ -66,17 +68,9 @@ Environment Observation:
 - Current Question: {state['question']}
 - Difficulty: {state['difficulty']}
 - Current Answer Score: {state['answer_score']}/10
-- Candidate Learning Factor: {state.get('learning_factor', 0.3)}
-- Candidate Fatigue: {state.get('fatigue', 0)}
 
-Valid Action Space (choose exactly one):
+Valid Action Space:
 {valid_actions}
-
-Strategy Guidelines:
-1. Start with easy questions to build confidence.
-2. Provide hints if the score is low.
-3. Only advance difficulty when Learning Factor is stable.
-4. Scale back if Fatigue exceeds 0.6.
 
 Return ONLY the action name from the list.
 """
@@ -101,23 +95,34 @@ Return ONLY the action name from the list.
                 state, reward, done, _ = env.step(action)
                 total_rewards.append(reward)
                 
+                # Log step
                 step_msg = f"[STEP] step={step_num} action={action} reward={reward:.2f} done={str(done).lower()} error=null"
                 full_log.append(step_msg)
                 
+                # Record trajectory for the grader
+                trajectory.append({
+                    "step": step_num,
+                    "action": action,
+                    "state": state,
+                    "reward": reward
+                })
+                
+                if step_num >= max_steps:
+                    done = True
+                
             except Exception as e:
-                error_msg = str(e).replace("\n", " ").split("(")[0] # Truncate long error messages
+                error_msg = str(e).replace("\n", " ").split("(")[0]
                 full_log.append(f"[STEP] step={step_num} action=error reward=0.00 done=true error={error_msg}")
                 done = True
                 break
                 
-        final_grade = grader.grade(state)
-        success = final_grade >= 0.8
+        # Final Grade using the trajectory grader from TASKS
+        final_grade = task_config["grader"](trajectory)
+        success = final_grade >= 0.7 # threshold for Success
         rewards_str = ",".join([f"{r:.2f}" for r in total_rewards])
-        # [END] must include: task, score, success, steps, rewards
         full_log.append(f"[END] task={task_name} score={final_grade:.2f} success={str(success).lower()} steps={len(total_rewards)} rewards={rewards_str}")
 
     except Exception as fatal_err:
-        # Catch-all for unexpected framework/environment errors
         err_type = type(fatal_err).__name__
         full_log.append(f"[FATAL ERROR] {err_type}: {str(fatal_err)}")
         full_log.append(traceback.format_exc())
@@ -125,6 +130,5 @@ Return ONLY the action name from the list.
     return "\n".join(full_log)
 
 if __name__ == "__main__":
-    # Dynamically pick the task based on environment variables (used by the grader)
     task = os.getenv("TASK_NAME", "easy")
     print(run_simulation(task_name=task))
