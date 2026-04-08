@@ -17,7 +17,7 @@ def run_simulation(task_name="easy", hf_token=None):
     try:
         # Configuration - Handle token precedence correctly
         api_url = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
-        model_name = os.getenv("MODEL_NAME", "deepseek-ai/DeepSeek-R1")
+        model_name = os.getenv("MODEL_NAME", "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B")
         env_name = "interview_coach"
         
         # Use provided token, then fallback to environment variables
