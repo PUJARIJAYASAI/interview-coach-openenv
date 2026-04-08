@@ -1,7 +1,7 @@
 import random
 
 class InterviewEnv:
-    def __init__(self):
+    def __init__(self, task_name="easy"):
         self.question_bank = {
             "easy": [
                 {"question": "Explain the difference between List and Set in Java.", "topic": "Java"},
@@ -24,7 +24,7 @@ class InterviewEnv:
         }
         self.learning_factor = 0.3
         self.fatigue = 0
-        self.reset()
+        self.reset(task_name=task_name)
 
     def reset(self, task_name="easy"):
         self.task_name = task_name
