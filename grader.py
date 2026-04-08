@@ -52,14 +52,18 @@ def grade_hard(state):
 
 def grade(state):
     """
-    Main grader entry point. Normalizes performance to 0.0-1.0.
-    Selects task-specific logic based on the state.
+    Main grader entry point. Handles multiple naming conventions for tasks.
     """
     try:
-        task = state.get("task_name", "easy")
-        if task == "hard":
+        # Check task_name, task_id, and id for flexibility
+        task = state.get("task_name") or state.get("task_id") or state.get("id") or "easy"
+        
+        # Normalize to lowercase and remove common prefixes
+        task_clean = str(task).lower().replace("interview_coach.", "")
+        
+        if "hard" in task_clean:
             return grade_hard(state)
-        elif task == "medium":
+        elif "medium" in task_clean:
             return grade_medium(state)
         else:
             return grade_easy(state)

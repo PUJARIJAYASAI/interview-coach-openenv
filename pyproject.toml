@@ -24,8 +24,13 @@ dependencies = [
 server = "server.app:main"
 interview-coach-sim = "inference:run_simulation"
 
-# Official registration for OpenEnv discovery
+# Redundant registration for maximum discovery compatibility
 [project.entry-points."openenv.tasks"]
+easy = "grader:grade_easy"
+medium = "grader:grade_medium"
+hard = "grader:grade_hard"
+
+[project.entry-points."openenv.graders"]
 easy = "grader:grade_easy"
 medium = "grader:grade_medium"
 hard = "grader:grade_hard"
