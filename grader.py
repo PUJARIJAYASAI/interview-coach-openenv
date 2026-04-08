@@ -1,8 +1,17 @@
+def clamp_score(score):
+    """
+    OpenEnv Phase 2 requires scores to be strictly between 0 and 1.
+    This clamps values to [0.01, 0.99].
+    """
+    return max(0.01, min(0.99, score))
+
 def grade_easy(state):
-    return min(1.0, state.get("answer_score", 0) / 8)
+    raw = state.get("answer_score", 0) / 8
+    return clamp_score(raw)
 
 def grade_medium(state):
-    return min(1.0, state.get("answer_score", 0) / 9)
+    raw = state.get("answer_score", 0) / 9
+    return clamp_score(raw)
 
 def grade_hard(state):
     # harder scoring
@@ -12,7 +21,7 @@ def grade_hard(state):
     if state.get("confidence", 0) > 0.7:
         base += 0.1
 
-    return min(1.0, base)
+    return clamp_score(base)
 
 def grade(state):
     """
