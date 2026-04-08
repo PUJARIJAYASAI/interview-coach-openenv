@@ -24,6 +24,12 @@ dependencies = [
 server = "server.app:main"
 interview-coach-sim = "inference:run_simulation"
 
+# Official registration for OpenEnv discovery
+[project.entry-points."openenv.tasks"]
+easy = "grader:grade_easy"
+medium = "grader:grade_medium"
+hard = "grader:grade_hard"
+
 [tool.setuptools]
 packages = ["server"]
 py-modules = ["env", "grader", "inference"]
