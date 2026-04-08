@@ -38,7 +38,8 @@ class InterviewEnv:
         self.learning_factor = 0.3
         self.fatigue = 0
         self.steps = 0
-        self.max_steps = 10
+        step_limits = {"easy": 5, "medium": 10, "hard": 15}
+        self.max_steps = step_limits.get(task_name, 10)
         return self.state()
 
     def _pick_question(self, difficulty):

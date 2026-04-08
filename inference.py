@@ -26,7 +26,7 @@ def run_simulation(task_name="easy", hf_token=None):
         if not api_key:
             start_msg = f"[START] task={task_name} env={env_name} model={model_name}"
             step_msg = f"[STEP] step=1 action=none reward=0.00 done=true error=Missing Token. Please provide HF_TOKEN in the UI or as a Space Secret."
-            end_msg = f"[END] success=false steps=1 rewards=0.00"
+            end_msg = f"[END] task={task_name} score=0.01 success=false steps=1 rewards=0.00"
             return "\n".join([start_msg, step_msg, end_msg])
 
         try:
@@ -34,15 +34,15 @@ def run_simulation(task_name="easy", hf_token=None):
         except Exception as client_err:
             start_msg = f"[START] task={task_name} env={env_name} model={model_name}"
             step_msg = f"[STEP] step=1 action=none reward=0.00 done=true error=Client Initialization Error: {str(client_err)}"
-            end_msg = f"[END] success=false steps=1 rewards=0.00"
+            end_msg = f"[END] task={task_name} score=0.01 success=false steps=1 rewards=0.00"
             return "\n".join([start_msg, step_msg, end_msg])
 
         # Environment setup
         env = InterviewEnv()
         state = env.reset(task_name=task_name)
         
-        step_limits = {"easy": 5, "medium": 10, "hard": 15}
-        env.max_steps = step_limits.get(task_name, 8)
+        # max_steps is already synced in env.reset() but we'll reflect it here for the log
+        max_steps = env.max_steps
 
         full_log.append(f"[START] task={task_name} env={env_name} model={model_name}")
         
@@ -60,7 +60,7 @@ Goal: Strategically improve the candidate's performance using Reinforcement Lear
 
 Current Session Meta:
 - Task Complexity: {task_name}
-- Step: {step_num}/{env.max_steps}
+- Step: {step_num}/{max_steps}
 
 Environment Observation:
 - Current Question: {state['question']}
@@ -112,7 +112,8 @@ Return ONLY the action name from the list.
         final_grade = grader.grade(state)
         success = final_grade >= 0.8
         rewards_str = ",".join([f"{r:.2f}" for r in total_rewards])
-        full_log.append(f"[END] success={str(success).lower()} steps={len(total_rewards)} rewards={rewards_str}")
+        # [END] must include: task, score, success, steps, rewards
+        full_log.append(f"[END] task={task_name} score={final_grade:.2f} success={str(success).lower()} steps={len(total_rewards)} rewards={rewards_str}")
 
     except Exception as fatal_err:
         # Catch-all for unexpected framework/environment errors
@@ -123,4 +124,6 @@ Return ONLY the action name from the list.
     return "\n".join(full_log)
 
 if __name__ == "__main__":
-    print(run_simulation())
+    # Dynamically pick the task based on environment variables (used by the grader)
+    task = os.getenv("TASK_NAME", "easy")
+    print(run_simulation(task_name=task))
