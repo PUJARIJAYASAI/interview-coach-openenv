@@ -161,7 +161,9 @@ class InterviewEnv:
         if new_score >= 8:
             reward += 10
 
-        reward = max(-4.0, min(4.0, reward))
+        # Normalize reward from [-4.0, 4.0] to [0.01, 0.99]
+        reward = (reward + 4) / 8
+        reward = max(0.01, min(0.99, reward))
 
         self.last_actions.append(action)
         self.history.append({"action": action, "score": self.answer_score})

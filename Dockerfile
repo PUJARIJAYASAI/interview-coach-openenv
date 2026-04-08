@@ -21,7 +21,7 @@ COPY --chown=user . .
 
 # Set default env vars for Hugging Face
 ENV API_BASE_URL=https://router.huggingface.co/v1
-ENV MODEL_NAME=deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+ENV MODEL_NAME=Qwen/Qwen2.5-72B-Instruct
 ENV TASK_NAME=easy
 
 # Expose port for FastAPI/Gradio
